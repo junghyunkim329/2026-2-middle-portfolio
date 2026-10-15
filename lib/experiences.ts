@@ -7,6 +7,7 @@ export type Experience = {
   image: string
   date: string
   author: string
+  tags: string[]
   sections: { heading: string; body: string }[]
   quote: string
 }
@@ -21,6 +22,7 @@ const experiences: Experience[] = [
       'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Desktop-ctcBl8zL1kk2872BYqyxoCmRnIyN2m.png',
     date: 'January 1, 2025',
     author: '김정현',
+    tags: ['정보 보안', '해킹'],
     sections: [
       {
         heading: '첫 번째 이야기',
@@ -46,6 +48,7 @@ const experiences: Experience[] = [
       'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Desktop-1-2GztLs0W7VemTjOVdhzMjUwMUKaINM.png',
     date: 'February 14, 2025',
     author: '김정현',
+    tags: ['개발', '실험'],
     sections: [
       {
         heading: '차고에서 시작한 실험',
@@ -71,6 +74,7 @@ const experiences: Experience[] = [
       'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Desktop-2-KKbFtMY0NG8EJGCdyo8FdcJ54jEQy5.png',
     date: 'March 20, 2025',
     author: '김정현',
+    tags: ['차량 보안', '정보 보안'],
     sections: [
       {
         heading: '안전한 이동을 위한 고민',
@@ -102,15 +106,23 @@ export async function getExperiences() {
   try {
     const docs = await (await client)
       .db('today-record')
-      .collection<Experience>('experiences')
+      .collection<Omit<Experience, 'tags'> & { tags?: string[] }>(
+        'experiences',
+      )
       .find({})
       .sort({ date: -1 })
       .toArray()
     return docs.length
-      ? docs.map(({ _id, ...experience }) => ({
-          ...experience,
-          id: String(experience.id ?? _id),
-        }))
+      ? docs.map(({ _id, ...experience }) => {
+          const id = String(experience.id ?? _id)
+          const fallbackTags =
+            experiences.find((item) => item.id === id)?.tags ?? ['기타']
+          return {
+            ...experience,
+            id,
+            tags: experience.tags?.length ? experience.tags : fallbackTags,
+          }
+        })
       : experiences
   } catch {
     return experiences
