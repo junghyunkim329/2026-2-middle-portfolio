@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb'
+import { MongoClient, type Collection } from 'mongodb'
 
 export type Experience = {
   id: string
@@ -11,6 +11,8 @@ export type Experience = {
   sections: { heading: string; body: string }[]
   quote: string
 }
+
+type StoredExperience = Omit<Experience, 'tags'> & { tags?: string[] }
 
 const experiences: Experience[] = [
   {
@@ -100,6 +102,32 @@ function getClient() {
   return clientPromise
 }
 
+export async function getExperienceCollection(): Promise<
+  Collection<StoredExperience>
+> {
+  const client = getClient()
+  if (!client) {
+    throw new Error('MONGODB_URI is not configured.')
+  }
+  return (await client).db('today-record').collection<StoredExperience>(
+    'experiences',
+  )
+}
+
+function normalizeExperience(
+  { _id, ...experience }: StoredExperience & { _id: unknown },
+): Experience {
+  const id = String(experience.id ?? _id)
+  const fallbackTags = experiences.find((item) => item.id === id)?.tags ?? [
+    '기타',
+  ]
+  return {
+    ...experience,
+    id,
+    tags: experience.tags?.length ? experience.tags : fallbackTags,
+  }
+}
+
 export async function getExperiences() {
   const client = getClient()
   if (!client) return experiences
@@ -112,21 +140,16 @@ export async function getExperiences() {
       .find({})
       .sort({ date: -1 })
       .toArray()
-    return docs.length
-      ? docs.map(({ _id, ...experience }) => {
-          const id = String(experience.id ?? _id)
-          const fallbackTags =
-            experiences.find((item) => item.id === id)?.tags ?? ['기타']
-          return {
-            ...experience,
-            id,
-            tags: experience.tags?.length ? experience.tags : fallbackTags,
-          }
-        })
-      : experiences
+    return docs.length ? docs.map(normalizeExperience) : experiences
   } catch {
     return experiences
   }
+}
+
+export async function getDatabaseExperiences() {
+  const collection = await getExperienceCollection()
+  const docs = await collection.find({}).sort({ date: -1 }).toArray()
+  return docs.map(normalizeExperience)
 }
 
 export async function getExperience(id: string) {
