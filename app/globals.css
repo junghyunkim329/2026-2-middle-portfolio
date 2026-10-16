@@ -39,7 +39,7 @@ a {
   background: #fff;
 }
 .brand {
-  font-size: clamp(26px, 3vw, 40px);
+  font-size: clamp(16px, 3vw, 20px);
   font-weight: 800;
   letter-spacing: -0.08em;
 }
@@ -389,6 +389,25 @@ main {
   font-size: 12px;
   font-weight: 400;
 }
+.admin-image-upload-status,
+.admin-image-upload-error {
+  font-size: 13px;
+  font-weight: 400;
+}
+.admin-image-upload-status {
+  color: var(--muted);
+}
+.admin-image-upload-error {
+  color: #9b3b22;
+}
+.admin-image-preview {
+  width: fit-content;
+  max-width: min(100%, 480px);
+  max-height: 280px;
+  border: 1px solid #e8e8e6;
+  border-radius: 8px;
+  object-fit: contain;
+}
 .admin-editor-panel,
 .admin-experience-list {
   margin-top: 42px;
@@ -475,6 +494,27 @@ main {
   max-width: 920px;
   padding: 42px 0 130px;
 }
+.experience-back-button {
+  margin: 0 0 32px;
+  padding: 10px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #dedede;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+.experience-back-button:hover {
+  border-color: #bdbdbd;
+  background: #f7f7f7;
+}
 .article-heading {
   text-align: center;
   margin-bottom: 64px;
@@ -491,10 +531,12 @@ main {
 }
 .article-image {
   display: block;
-  width: 100%;
-  height: 430px;
+  /* width: 100%; */
+  height: 300px;
   object-fit: cover;
   border-radius: 14px;
+  margin-left: auto;
+  margin-right: auto;
   margin-bottom: 92px;
 }
 .article-body {
@@ -523,6 +565,23 @@ main {
   letter-spacing: -0.06em;
   margin: 115px -100px 130px;
 }
+.article-reference-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 16px;
+  border: 1px solid #dedede;
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 15px;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+.article-reference-link:hover {
+  border-color: #bdbdbd;
+  background: #f7f7f7;
+}
 .site-footer {
   border-top: 1px solid #ddd;
   padding: 54px 5%;
@@ -538,7 +597,18 @@ main {
   font-weight: 700;
 }
 .socials a {
-  font-size: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+.socials a:hover {
+  color: var(--ink);
+}
+.socials svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.8;
 }
 @media (max-width: 1200px) {
   main {
@@ -684,6 +754,9 @@ main {
   }
   .article-heading {
     margin-bottom: 38px;
+  }
+  .experience-back-button {
+    margin-bottom: 24px;
   }
   .article-heading h1 {
     font-size: 40px;

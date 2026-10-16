@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { FaBookOpen, FaEnvelope, FaGithub } from 'react-icons/fa'
 
 export function SiteHeader() {
   return (
@@ -15,7 +16,9 @@ export function SiteHeader() {
         >
           Github
         </a>
-        <a href="https://shshjang14.tistory.com/">Blog</a>
+        <a href="https://shshjang14.tistory.com/" target="_blank">
+          Blog
+        </a>
         <a href="mailto:shshjang14@gmail.com">Email</a>
       </nav>
     </header>
@@ -27,14 +30,23 @@ export function SiteFooter() {
     <footer className="site-footer">
       <strong>Let&apos;s work together</strong>
       <div className="socials">
-        <a href="https://github.com/junghyunkim329" aria-label="Github">
-          ◎
+        <a
+          href="https://github.com/junghyunkim329"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Github"
+        >
+          <FaGithub aria-hidden="true" />
         </a>
-        <a href="https://shshjang14.tistory.com/" aria-label="Blog">
-          in
+        <a
+          href="https://shshjang14.tistory.com/"
+          target="_blank"
+          aria-label="Blog"
+        >
+          <FaBookOpen aria-hidden="true" />
         </a>
         <a href="mailto:shshjang14@gmail.com" aria-label="Email">
-          𝕏
+          <FaEnvelope aria-hidden="true" />
         </a>
       </div>
     </footer>
