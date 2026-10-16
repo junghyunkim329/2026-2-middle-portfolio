@@ -24,21 +24,21 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        {/* <section className="interests">
-          <h2>Interests and hobbies</h2>
+        <section className="interests">
+          {/* <h2>Interests and hobbies</h2>
           <p className="section-lede">
             A little section to round out the professional purpose of this
             webpage. Who&apos;s the person behind it, really? What do they
             like—and what are they like? Sections like this can go a little bit
             longer because it&apos;s nice to learn more about what makes someone
             tick.
-          </p>
+          </p> */}
           <div className="card-grid">
             {experiences.map((experience) => (
               <ExperienceCard key={experience.id} experience={experience} />
             ))}
           </div>
-        </section> */}
+        </section>
       </main>
       <SiteFooter />
     </>
