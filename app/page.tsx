@@ -24,7 +24,7 @@ export default async function Home() {
             </div>
           </div>
         </section>
-        <section className="interests">
+        {/* <section className="interests">
           <h2>Interests and hobbies</h2>
           <p className="section-lede">
             A little section to round out the professional purpose of this
@@ -38,7 +38,7 @@ export default async function Home() {
               <ExperienceCard key={experience.id} experience={experience} />
             ))}
           </div>
-        </section>
+        </section> */}
       </main>
       <SiteFooter />
     </>
