@@ -3,8 +3,11 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: '오늘의 기록',
+  title: { absolute: '오늘의 기록' },
   description: '경험과 프로젝트를 기록합니다.',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 export const viewport: Viewport = {
   colorScheme: 'light',
