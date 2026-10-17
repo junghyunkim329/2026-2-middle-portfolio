@@ -131,8 +131,11 @@ main {
   display: block;
   width: 100%;
   height: 235px;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
+}
+.experience-card > img[src='/main.png'] {
+  object-fit: cover;
 }
 .card-copy {
   padding: 25px 24px 28px;
