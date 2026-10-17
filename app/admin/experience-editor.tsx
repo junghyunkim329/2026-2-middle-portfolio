@@ -18,6 +18,7 @@ import {
   type ExperienceAttachment,
   type ExperienceAttachmentKind,
 } from '@/lib/experience-attachments'
+import { moveExperienceSection } from '@/lib/experience-sections'
 
 const initialState: AdminActionState = {}
 const maximumCoverImageSize = 5 * 1024 * 1024
@@ -567,17 +568,47 @@ export function ExperienceEditor({
               />
             </label>
             {sections.length > 1 && (
-              <button
-                className="admin-text-button"
-                onClick={() =>
-                  setSections((current) =>
-                    current.filter((_, sectionIndex) => sectionIndex !== index),
-                  )
-                }
-                type="button"
-              >
-                이 내용 삭제
-              </button>
+              <div className="admin-section-actions">
+                <button
+                  aria-label={`내용 ${index + 1} 위로 이동`}
+                  className="admin-text-button"
+                  disabled={index === 0}
+                  onClick={() =>
+                    setSections((current) =>
+                      moveExperienceSection(current, index, -1),
+                    )
+                  }
+                  type="button"
+                >
+                  ↑ 위로
+                </button>
+                <button
+                  aria-label={`내용 ${index + 1} 아래로 이동`}
+                  className="admin-text-button"
+                  disabled={index === sections.length - 1}
+                  onClick={() =>
+                    setSections((current) =>
+                      moveExperienceSection(current, index, 1),
+                    )
+                  }
+                  type="button"
+                >
+                  ↓ 아래로
+                </button>
+                <button
+                  className="admin-delete-button admin-text-button"
+                  onClick={() =>
+                    setSections((current) =>
+                      current.filter(
+                        (_, sectionIndex) => sectionIndex !== index,
+                      ),
+                    )
+                  }
+                  type="button"
+                >
+                  이 내용 삭제
+                </button>
+              </div>
             )}
           </fieldset>
         ))}

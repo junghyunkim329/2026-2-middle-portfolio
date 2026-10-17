@@ -598,8 +598,17 @@ main {
   color: var(--muted);
   font-size: 13px;
 }
-.admin-section-fieldset .admin-text-button {
-  justify-self: end;
+.admin-section-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.admin-section-actions .admin-text-button:disabled {
+  color: #c7c7c3;
+  cursor: not-allowed;
+}
+.admin-section-fieldset .admin-delete-button {
+  margin-left: auto;
   color: #9b3b22;
 }
 .admin-experience-list ul {
