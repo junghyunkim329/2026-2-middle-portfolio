@@ -4,7 +4,10 @@ import { getExperienceTemplateLabel } from '@/lib/experience-templates'
 
 export function ExperienceCard({ experience }: { experience: Experience }) {
   return (
-    <article className="experience-card">
+    <Link
+      className="experience-card"
+      href={`/experience/${experience.id}`}
+    >
       <img src={experience.image} alt="" />
       <div className="card-copy">
         <span className="experience-type-badge">
@@ -12,8 +15,8 @@ export function ExperienceCard({ experience }: { experience: Experience }) {
         </span>
         <h2>{experience.title}</h2>
         <p>{experience.description}</p>
-        <Link href={`/experience/${experience.id}`}>자세히 보기 →</Link>
+        <span className="card-details-link">자세히 보기 →</span>
       </div>
-    </article>
+    </Link>
   )
 }
