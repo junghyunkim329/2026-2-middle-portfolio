@@ -693,14 +693,16 @@ main {
 }
 .article-body h2 {
   font-size: 24px;
+  font-weight: 700;
   letter-spacing: -0.04em;
   margin: 0 0 14px;
 }
 .article-body p {
-  color: var(--muted);
+  color: var(--ink);
   line-height: 1.55;
   font-size: 17px;
   margin: 0;
+  white-space: pre-line;
 }
 .article-attachment-list {
   display: grid;
