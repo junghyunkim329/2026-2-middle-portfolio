@@ -10,7 +10,18 @@ import {
   isAdminConfigured,
   verifyAdminPassword,
 } from '@/lib/admin-auth'
-import { getExperienceCollection, type Experience } from '@/lib/experiences'
+import {
+  getDatabaseExperiences,
+  getExperienceCollection,
+  saveHomepageFeaturedExperienceIds,
+  type Experience,
+} from '@/lib/experiences'
+import { isExperienceTemplateId } from '@/lib/experience-templates'
+import { parseExperienceAttachments } from '@/lib/experience-attachments'
+import {
+  formatExperienceDate,
+  isValidDateInput,
+} from '@/lib/experience-dates'
 
 export type AdminActionState = {
   error?: string
@@ -20,6 +31,15 @@ export type AdminActionState = {
 function getText(formData: FormData, key: string) {
   const value = formData.get(key)
   return typeof value === 'string' ? value.trim() : ''
+}
+
+function isHttpUrl(value: string) {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
 }
 
 export async function loginAdmin(
@@ -47,11 +67,13 @@ export async function logoutAdmin() {
 
 function parseExperience(formData: FormData): Experience | string {
   const id = getText(formData, 'id')
+  const template = getText(formData, 'template')
   const title = getText(formData, 'title')
   const description = getText(formData, 'description')
   const image = getText(formData, 'image')
-  const date = getText(formData, 'date')
-  const author = getText(formData, 'author')
+  const startDate = getText(formData, 'startDate')
+  const endDate = getText(formData, 'endDate')
+  const referenceLink = getText(formData, 'referenceLink')
   const quote = getText(formData, 'quote')
   const tags = getText(formData, 'tags')
     .split(',')
@@ -59,12 +81,30 @@ function parseExperience(formData: FormData): Experience | string {
     .filter(Boolean)
   const headings = formData.getAll('sectionHeading')
   const bodies = formData.getAll('sectionBody')
+  const attachments = parseExperienceAttachments(
+    formData.getAll('attachmentKind'),
+    formData.getAll('attachmentTitle'),
+    formData.getAll('attachmentUrl'),
+  )
 
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id)) {
     return 'ID는 영문 소문자, 숫자, 하이픈만 사용할 수 있습니다.'
   }
-  if (!title || !description || !image || !date || !author || !quote) {
+  if (!isExperienceTemplateId(template)) {
+    return '지원하는 경험 템플릿을 선택해주세요.'
+  }
+  if (typeof attachments === 'string') return attachments
+  if (!title || !description || !image) {
     return '모든 필수 항목을 입력해주세요.'
+  }
+  if (!isValidDateInput(startDate)) {
+    return '올바른 시작 날짜를 선택해주세요.'
+  }
+  if (endDate && !isValidDateInput(endDate)) {
+    return '올바른 종료 날짜를 선택해주세요.'
+  }
+  if (endDate && endDate < startDate) {
+    return '종료 날짜는 시작 날짜보다 빠를 수 없습니다.'
   }
   if (tags.length === 0 || tags.length > 20 || tags.some((tag) => tag.length > 40)) {
     return '태그를 1개 이상 입력해주세요. 태그는 쉼표로 구분하며 최대 20개까지 가능합니다.'
@@ -80,6 +120,9 @@ function parseExperience(formData: FormData): Experience | string {
   ) {
     return '이미지는 https:// 또는 / 로 시작하는 주소를 입력해주세요.'
   }
+  if (referenceLink && !isHttpUrl(referenceLink)) {
+    return '참고 링크는 http:// 또는 https:// 로 시작하는 주소를 입력해주세요.'
+  }
 
   const sections = headings.map((heading, index) => ({
     heading: typeof heading === 'string' ? heading.trim() : '',
@@ -91,14 +134,18 @@ function parseExperience(formData: FormData): Experience | string {
 
   return {
     id,
+    template,
     title,
     description,
     image,
-    date,
-    author,
+    date: formatExperienceDate(startDate, endDate || undefined),
+    startDate,
+    ...(endDate ? { endDate } : {}),
     tags: [...new Set(tags)],
+    ...(referenceLink ? { referenceLink } : {}),
+    attachments,
     sections,
-    quote,
+    ...(quote ? { quote } : {}),
   }
 }
 
@@ -136,7 +183,18 @@ export async function saveExperience(
     if (duplicate) return { error: '이미 사용 중인 ID입니다.' }
 
     if (existing) {
-      await collection.updateOne({ _id: existing._id }, { $set: parsed })
+      await collection.updateOne(
+        { _id: existing._id },
+        {
+          $set: parsed,
+          $unset: {
+            author: '',
+            ...(!parsed.quote ? { quote: '' } : {}),
+            ...(!parsed.endDate ? { endDate: '' } : {}),
+            ...(!parsed.referenceLink ? { referenceLink: '' } : {}),
+          },
+        },
+      )
     } else {
       await collection.insertOne(parsed)
     }
@@ -174,6 +232,38 @@ export async function deleteExperience(
   revalidatePath('/')
   revalidatePath('/experience')
   revalidatePath('/experience/[id]', 'page')
+  revalidatePath('/admin')
+  return { success: true }
+}
+
+export async function saveFeaturedExperiences(
+  _previousState: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  if (!(await hasAdminSession())) redirect('/admin')
+
+  const rawIds = formData.getAll('featuredExperienceIds')
+  if (rawIds.length > 3 || rawIds.some((id) => typeof id !== 'string' || !id)) {
+    return { error: '홈 화면에는 경험을 최대 3개까지 선택할 수 있습니다.' }
+  }
+
+  const ids = rawIds.filter((id): id is string => typeof id === 'string')
+  if (new Set(ids).size !== ids.length) {
+    return { error: '같은 경험을 중복해서 선택할 수 없습니다.' }
+  }
+
+  try {
+    const experiences = await getDatabaseExperiences()
+    if (ids.some((id) => !experiences.some((experience) => experience.id === id))) {
+      return { error: '목록에서 경험을 다시 선택해주세요.' }
+    }
+    await saveHomepageFeaturedExperienceIds(ids)
+  } catch (error) {
+    console.error('Failed to save featured experiences:', error)
+    return { error: '홈 화면 설정 저장에 실패했습니다. DB 연결 및 설정을 확인해주세요.' }
+  }
+
+  revalidatePath('/')
   revalidatePath('/admin')
   return { success: true }
 }

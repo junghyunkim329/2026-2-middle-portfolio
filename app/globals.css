@@ -135,6 +135,15 @@ main {
   flex-direction: column;
   align-items: flex-start;
 }
+.experience-type-badge {
+  margin-bottom: 12px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #f1f1ef;
+  color: #555;
+  font-size: 12px;
+  font-weight: 700;
+}
 .card-copy h2 {
   font-size: 23px;
   letter-spacing: -0.04em;
@@ -309,6 +318,68 @@ main {
   display: grid;
   gap: 18px;
 }
+.admin-template-picker {
+  min-width: 0;
+  margin: 0;
+  padding: 20px;
+  border: 1px solid #dedede;
+  border-radius: 12px;
+}
+.admin-template-picker > legend {
+  padding: 0 7px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.admin-template-picker > p {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.admin-template-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.admin-form .admin-template-options label {
+  min-width: 0;
+  padding: 14px;
+  display: flex;
+  grid-template-columns: none;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid #dedede;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+}
+.admin-form .admin-template-options label:hover,
+.admin-form .admin-template-options label.selected {
+  border-color: var(--ink);
+  background: #f7f7f5;
+}
+.admin-template-options input {
+  width: 16px;
+  min-height: 16px;
+  margin: 2px 0 0;
+  padding: 0;
+  flex: 0 0 16px;
+  accent-color: var(--ink);
+}
+.admin-template-options span {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+.admin-template-options strong {
+  font-size: 14px;
+}
+.admin-template-options small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.45;
+}
 .admin-form label {
   display: grid;
   gap: 8px;
@@ -317,7 +388,8 @@ main {
   font-weight: 600;
 }
 .admin-form input,
-.admin-form textarea {
+.admin-form textarea,
+.admin-form select {
   width: 100%;
   min-height: 44px;
   padding: 11px 13px;
@@ -333,7 +405,8 @@ main {
   resize: vertical;
 }
 .admin-form input:focus,
-.admin-form textarea:focus {
+.admin-form textarea:focus,
+.admin-form select:focus {
   border-color: #555;
 }
 .admin-primary-button,
@@ -408,11 +481,67 @@ main {
   border-radius: 8px;
   object-fit: contain;
 }
+.admin-attachments {
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+  border: 1px solid #e8e8e6;
+  border-radius: 10px;
+}
+.admin-attachments-heading,
+.admin-attachment-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.admin-attachments-heading > div:first-child,
+.admin-attachment-fields {
+  display: grid;
+  gap: 8px;
+}
+.admin-attachment-list {
+  display: grid;
+  gap: 12px;
+}
+.admin-attachment-item {
+  padding: 14px;
+  display: grid;
+  grid-template-columns: minmax(120px, 180px) 1fr;
+  gap: 16px;
+  border: 1px solid #ececea;
+  border-radius: 8px;
+  background: #fafaf9;
+}
+.admin-attachment-item > img,
+.admin-attachment-item > video {
+  width: 100%;
+  height: 130px;
+  border-radius: 6px;
+  background: #ececea;
+  object-fit: contain;
+}
+.admin-attachment-item:not(:has(> img, > video)) {
+  grid-template-columns: 1fr;
+}
+.admin-attachment-type {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.admin-attachment-fields .admin-text-button {
+  justify-self: end;
+  color: #9b3b22;
+}
 .admin-editor-panel,
+.admin-featured-section,
 .admin-experience-list {
   margin-top: 42px;
   padding-top: 32px;
   border-top: 1px solid #e8e8e6;
+}
+.admin-featured-section > .admin-description {
+  margin: 12px 0 20px;
 }
 .admin-section-title {
   margin-bottom: 22px;
@@ -433,6 +562,14 @@ main {
   gap: 18px;
 }
 .admin-field-wide {
+  grid-column: 1 / -1;
+}
+.admin-date-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 18px;
+}
+.admin-date-fields .admin-field-hint {
   grid-column: 1 / -1;
 }
 .admin-sections-heading {
@@ -476,6 +613,14 @@ main {
 .admin-experience-copy strong {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.admin-experience-copy small {
+  width: fit-content;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #f1f1ef;
+  color: #555;
+  font-size: 11px;
 }
 .admin-experience-copy span {
   color: var(--muted);
@@ -556,6 +701,54 @@ main {
   line-height: 1.55;
   font-size: 17px;
   margin: 0;
+}
+.article-attachment-list {
+  display: grid;
+  gap: 18px;
+}
+.article-attachment-media {
+  margin: 0;
+}
+.article-attachment-media img,
+.article-attachment-media video {
+  display: block;
+  width: 100%;
+  max-height: 520px;
+  border-radius: 12px;
+  background: #111;
+  object-fit: contain;
+}
+.article-attachment-media figcaption {
+  margin-top: 9px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.article-attachment-link {
+  padding: 18px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid #dedede;
+  border-radius: 10px;
+  color: var(--ink);
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+.article-attachment-link:hover {
+  border-color: #bdbdbd;
+  background: #f7f7f7;
+}
+.article-attachment-link span {
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #efefed;
+  font-size: 12px;
+  font-weight: 800;
+}
+.article-attachment-link small {
+  color: var(--muted);
 }
 .article-body blockquote {
   font-size: clamp(30px, 5vw, 49px);
@@ -734,8 +927,28 @@ main {
   .admin-form-grid {
     grid-template-columns: 1fr;
   }
+  .admin-template-options {
+    grid-template-columns: 1fr;
+  }
   .admin-field-wide {
     grid-column: auto;
+  }
+  .admin-date-fields {
+    grid-template-columns: 1fr;
+  }
+  .admin-date-fields .admin-field-hint {
+    grid-column: auto;
+  }
+  .admin-attachments-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .admin-attachment-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .admin-attachment-item {
+    grid-template-columns: 1fr;
   }
   .admin-experience-row {
     align-items: flex-start;
@@ -775,6 +988,12 @@ main {
   }
   .article-body p {
     font-size: 14px;
+  }
+  .article-attachment-link {
+    grid-template-columns: auto 1fr;
+  }
+  .article-attachment-link small {
+    grid-column: 2;
   }
   .article-body blockquote {
     margin: 92px 0 104px;

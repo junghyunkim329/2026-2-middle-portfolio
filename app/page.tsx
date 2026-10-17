@@ -1,9 +1,17 @@
 import { ExperienceCard } from '@/components/experience-card'
 import { SiteFooter, SiteHeader } from '@/components/site-header'
-import { getExperiences } from '@/lib/experiences'
+import {
+  getExperiences,
+  getHomepageFeaturedExperienceIds,
+} from '@/lib/experiences'
+import { selectHomepageExperiences } from '@/lib/homepage-experiences'
 
 export default async function Home() {
-  const experiences = await getExperiences()
+  const [allExperiences, featuredIds] = await Promise.all([
+    getExperiences(),
+    getHomepageFeaturedExperienceIds(),
+  ])
+  const experiences = selectHomepageExperiences(allExperiences, featuredIds)
   return (
     <>
       <SiteHeader />

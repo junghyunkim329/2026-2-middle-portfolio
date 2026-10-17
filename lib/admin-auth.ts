@@ -2,9 +2,12 @@ import 'server-only'
 
 import { createHmac, createHash, timingSafeEqual } from 'node:crypto'
 import { cookies } from 'next/headers'
-
-const COOKIE_NAME = 'portfolio-admin-session'
-const SESSION_DURATION_SECONDS = 60 * 60 * 12
+import {
+  ADMIN_SESSION_COOKIE_NAME,
+  ADMIN_SESSION_DURATION_SECONDS,
+  createAdminSessionCookie,
+  expireAdminSessionCookie,
+} from '@/lib/admin-session-cookie'
 
 function getSessionSecret() {
   const secret = process.env.ADMIN_SESSION_SECRET
@@ -41,26 +44,26 @@ export function verifyAdminPassword(password: string) {
 }
 
 export async function createAdminSession() {
-  const expiresAt = Math.floor(Date.now() / 1000) + SESSION_DURATION_SECONDS
+  const expiresAt =
+    Math.floor(Date.now() / 1000) + ADMIN_SESSION_DURATION_SECONDS
   const payload = String(expiresAt)
   const cookieStore = await cookies()
-  cookieStore.set(COOKIE_NAME, `${payload}.${sign(payload)}`, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/admin',
-    maxAge: SESSION_DURATION_SECONDS,
-  })
+  const cookie = createAdminSessionCookie(
+    `${payload}.${sign(payload)}`,
+    process.env.NODE_ENV === 'production',
+  )
+  cookieStore.set(cookie.name, cookie.value, cookie.options)
 }
 
 export async function clearAdminSession() {
   const cookieStore = await cookies()
-  cookieStore.delete(COOKIE_NAME)
+  const cookie = expireAdminSessionCookie(process.env.NODE_ENV === 'production')
+  cookieStore.set(cookie.name, cookie.value, cookie.options)
 }
 
 export async function hasAdminSession() {
   if (!isAdminConfigured()) return false
-  const token = (await cookies()).get(COOKIE_NAME)?.value
+  const token = (await cookies()).get(ADMIN_SESSION_COOKIE_NAME)?.value
   if (!token) return false
 
   const [payload, signature, ...extra] = token.split('.')

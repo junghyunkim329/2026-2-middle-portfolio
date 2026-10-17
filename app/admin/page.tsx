@@ -6,8 +6,11 @@ import { ExperienceEditor } from './experience-editor'
 import { hasAdminSession, isAdminConfigured } from '@/lib/admin-auth'
 import {
   getDatabaseExperiences,
+  getHomepageFeaturedExperienceIds,
   type Experience,
 } from '@/lib/experiences'
+import { getExperienceTemplateLabel } from '@/lib/experience-templates'
+import { FeaturedExperiencesForm } from './featured-experiences-form'
 
 export const dynamic = 'force-dynamic'
 
@@ -60,14 +63,23 @@ export default async function AdminPage({
   }
 
   let experiences: Experience[]
+  let featuredExperienceIds: string[] = []
   let databaseError = false
   try {
-    experiences = await getDatabaseExperiences()
+    const [loadedExperiences, loadedFeaturedExperienceIds] = await Promise.all([
+      getDatabaseExperiences(),
+      getHomepageFeaturedExperienceIds(),
+    ])
+    experiences = loadedExperiences
+    featuredExperienceIds = loadedFeaturedExperienceIds
   } catch (error) {
     console.error('Failed to load admin experiences:', error)
     experiences = []
     databaseError = true
   }
+  const validFeaturedExperienceIds = featuredExperienceIds
+    .filter((id) => experiences.some((experience) => experience.id === id))
+    .slice(0, 3)
 
   const selectedExperience = params.edit
     ? experiences.find((experience) => experience.id === params.edit) ?? null
@@ -98,6 +110,20 @@ export default async function AdminPage({
             DB에서 경험을 불러오지 못했습니다. 연결 설정을 확인해주세요.
           </p>
         )}
+        <section className="admin-featured-section">
+          <div className="admin-section-title">
+            <h2>홈 화면에 표시할 경험</h2>
+            <span>{validFeaturedExperienceIds.length}/3개 선택</span>
+          </div>
+          <p className="admin-description">
+            최대 3개까지 선택할 수 있습니다. 선택하지 않으면 최신 프로젝트
+            3개가 표시됩니다.
+          </p>
+          <FeaturedExperiencesForm
+            experiences={experiences}
+            selectedIds={validFeaturedExperienceIds}
+          />
+        </section>
         {showEditor && (
           <section className="admin-editor-panel">
             <div className="admin-section-title">
@@ -129,6 +155,9 @@ export default async function AdminPage({
                 <li className="admin-experience-row" key={experience.id}>
                   <div className="admin-experience-copy">
                     <strong>{experience.title}</strong>
+                    <small>
+                      {getExperienceTemplateLabel(experience.template)}
+                    </small>
                     <span>{experience.tags.join(' · ')}</span>
                   </div>
                   <div className="admin-row-actions">

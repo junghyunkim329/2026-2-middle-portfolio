@@ -10,7 +10,10 @@ export function ExperienceList({ experiences }: { experiences: Experience[] }) {
   const [selectedTag, setSelectedTag] = useState('전체')
 
   const tags = useMemo(
-    () => ['전체', ...new Set(experiences.flatMap((experience) => experience.tags))],
+    () => [
+      '전체',
+      ...new Set(experiences.flatMap((experience) => experience.tags)),
+    ],
     [experiences],
   )
   const filteredExperiences = useMemo(() => {
@@ -22,7 +25,6 @@ export function ExperienceList({ experiences }: { experiences: Experience[] }) {
       const searchableText = [
         experience.title,
         experience.description,
-        experience.author,
         experience.date,
         ...experience.tags,
       ]
