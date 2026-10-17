@@ -828,6 +828,10 @@ main {
     padding-left: 5%;
     padding-right: 5%;
   }
+  .experience-page {
+    padding-right: 5%;
+    padding-left: 5%;
+  }
   .interests {
     padding-left: 5%;
     padding-right: 5%;
@@ -836,6 +840,67 @@ main {
   .interests > h2,
   .section-lede {
     max-width: none;
+  }
+}
+@media (min-width: 701px) and (max-width: 1024px) {
+  .about {
+    padding: 80px 0 90px;
+  }
+  .about h1,
+  .experience-page > h1 {
+    font-size: 44px;
+    margin-bottom: 40px;
+  }
+  .intro {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+  .intro img {
+    height: clamp(300px, 48vw, 360px);
+  }
+  .intro p {
+    max-width: 620px;
+  }
+  .interests {
+    padding-top: 64px;
+    padding-bottom: 90px;
+  }
+  .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+  .experience-card > img {
+    height: 200px;
+  }
+  .card-copy {
+    min-height: 190px;
+    padding: 22px 20px 24px;
+  }
+  .card-copy h2 {
+    font-size: 20px;
+  }
+  .card-copy p,
+  .card-details-link {
+    font-size: 15px;
+  }
+  .experience-page {
+    padding-top: 80px;
+    padding-bottom: 100px;
+  }
+  .article-page {
+    padding: 34px 5% 100px;
+  }
+  .article-heading {
+    margin-bottom: 48px;
+  }
+  .article-heading h1 {
+    font-size: 48px;
+  }
+  .article-image {
+    width: 100%;
+    height: auto;
+    max-height: 420px;
+    object-fit: contain;
   }
 }
 @media (max-width: 700px) {
