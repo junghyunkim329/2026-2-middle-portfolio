@@ -32,8 +32,10 @@ function createEditableAttachment(
 }
 
 export function ExperienceEditor({
+  availableImages,
   experience,
 }: {
+  availableImages: string[]
   experience: Experience | null
 }) {
   const [state, formAction, pending] = useActionState(
@@ -300,34 +302,67 @@ export function ExperienceEditor({
             rows={2}
           />
         </label>
-        <label className="admin-field-wide">
-          대표 이미지 URL
-          <input
-            onChange={(event) => setImage(event.target.value)}
-            name="image"
-            placeholder="https://... 또는 /image.jpg"
-            required
-            value={image}
-          />
-          <span className="admin-field-hint">
-            목록 카드와 상세 페이지 상단에 표시되는 필수 이미지입니다. 5MB 이하의
-            JPG, PNG, WebP, GIF를 사용할 수 있습니다.
-          </span>
-          <input
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            disabled={uploading}
-            onChange={uploadCoverImage}
-            type="file"
-          />
-          {uploadingArea === 'cover' && (
-            <span className="admin-image-upload-status" aria-live="polite">
-              대표 이미지 업로드 중... {uploadProgress}%
+        <div className="admin-cover-field admin-field-wide">
+          <label>
+            대표 이미지 URL
+            <input
+              onChange={(event) => setImage(event.target.value)}
+              name="image"
+              placeholder="https://... 또는 /image.jpg"
+              required
+              value={image}
+            />
+            <span className="admin-field-hint">
+              목록 카드와 상세 페이지 상단에 표시되는 필수 이미지입니다. 5MB
+              이하의 JPG, PNG, WebP, GIF를 사용할 수 있습니다.
             </span>
-          )}
-          {uploadError && (
-            <span className="admin-image-upload-error" role="alert">
-              {uploadError}
-            </span>
+            <input
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              disabled={uploading}
+              onChange={uploadCoverImage}
+              type="file"
+            />
+            {uploadingArea === 'cover' && (
+              <span className="admin-image-upload-status" aria-live="polite">
+                대표 이미지 업로드 중... {uploadProgress}%
+              </span>
+            )}
+            {uploadError && (
+              <span className="admin-image-upload-error" role="alert">
+                {uploadError}
+              </span>
+            )}
+          </label>
+          {availableImages.length > 0 && (
+            <fieldset className="admin-public-image-picker">
+              <legend>Git 이미지에서 선택</legend>
+              <p>public 폴더에 있는 이미지를 클릭하면 경로가 자동 입력됩니다.</p>
+              <div className="admin-public-image-grid">
+                {availableImages.map((imagePath) => {
+                  const selected = image === imagePath
+                  return (
+                    <button
+                      aria-label={`${imagePath} 대표 이미지로 선택`}
+                      aria-pressed={selected}
+                      className={`admin-public-image-option${
+                        selected ? ' selected' : ''
+                      }`}
+                      key={imagePath}
+                      onClick={() => setImage(imagePath)}
+                      type="button"
+                    >
+                      <img alt="" src={imagePath} />
+                      <span title={imagePath}>{imagePath}</span>
+                      {selected && (
+                        <span aria-hidden="true" className="admin-image-check">
+                          ✓
+                        </span>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            </fieldset>
           )}
           {image && (
             <img
@@ -336,7 +371,7 @@ export function ExperienceEditor({
               alt="경험 사진 미리보기"
             />
           )}
-        </label>
+        </div>
         <div className="admin-attachments admin-field-wide">
           <div className="admin-attachments-heading">
             <div>

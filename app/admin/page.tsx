@@ -10,6 +10,7 @@ import {
   type Experience,
 } from '@/lib/experiences'
 import { getExperienceTemplateLabel } from '@/lib/experience-templates'
+import { listPublicImagePaths } from '@/lib/public-images'
 import { FeaturedExperiencesForm } from './featured-experiences-form'
 
 export const dynamic = 'force-dynamic'
@@ -64,14 +65,18 @@ export default async function AdminPage({
 
   let experiences: Experience[]
   let featuredExperienceIds: string[] = []
+  let availableImages: string[] = []
   let databaseError = false
   try {
-    const [loadedExperiences, loadedFeaturedExperienceIds] = await Promise.all([
-      getDatabaseExperiences(),
-      getHomepageFeaturedExperienceIds(),
-    ])
+    const [loadedExperiences, loadedFeaturedExperienceIds, publicImagePaths] =
+      await Promise.all([
+        getDatabaseExperiences(),
+        getHomepageFeaturedExperienceIds(),
+        listPublicImagePaths(),
+      ])
     experiences = loadedExperiences
     featuredExperienceIds = loadedFeaturedExperienceIds
+    availableImages = publicImagePaths
   } catch (error) {
     console.error('Failed to load admin experiences:', error)
     experiences = []
@@ -136,6 +141,7 @@ export default async function AdminPage({
               <p className="admin-notice">수정할 경험을 찾을 수 없습니다.</p>
             ) : (
               <ExperienceEditor
+                availableImages={availableImages}
                 experience={selectedExperience}
                 key={selectedExperience?.id ?? 'new-experience'}
               />
