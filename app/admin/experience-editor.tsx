@@ -9,6 +9,7 @@ import {
   createTemplateSections,
   EXPERIENCE_TEMPLATE_IDS,
   EXPERIENCE_TEMPLATES,
+  shouldPreserveTemplateSections,
   type ExperienceTemplateId,
 } from '@/lib/experience-templates'
 import { toDateInputValue } from '@/lib/experience-dates'
@@ -70,24 +71,10 @@ export function ExperienceEditor({
   function selectTemplate(nextTemplate: ExperienceTemplateId) {
     if (nextTemplate === template) return
 
-    const currentHeadings = EXPERIENCE_TEMPLATES[template].headings
-    const hasEditedSections =
-      sections.length !== currentHeadings.length ||
-      sections.some(
-        (section, index) =>
-          section.body.trim() || section.heading !== currentHeadings[index],
-      )
-
-    if (
-      hasEditedSections &&
-      !window.confirm(
-        '템플릿을 변경하면 현재 경험 내용이 새 템플릿 항목으로 교체됩니다. 계속할까요?',
-      )
-    ) {
-      return
-    }
-
+    const preserveSections = shouldPreserveTemplateSections(template, sections)
     setTemplate(nextTemplate)
+    if (preserveSections) return
+
     setSections(
       createTemplateSections(nextTemplate).map((section) => ({
         ...section,
@@ -217,8 +204,8 @@ export function ExperienceEditor({
     }
   }
 
-  function addDocumentLink(
-    kind: Extract<ExperienceAttachmentKind, 'pdf' | 'presentation'>,
+  function addLinkAttachment(
+    kind: Extract<ExperienceAttachmentKind, 'pdf' | 'presentation' | 'link'>,
   ) {
     if (attachments.length >= MAX_EXPERIENCE_ATTACHMENTS) {
       setAttachmentUploadError(
@@ -377,7 +364,7 @@ export function ExperienceEditor({
             <div>
               <strong>추가 자료</strong>
               <span className="admin-field-hint">
-                사진·GIF·동영상은 직접 업로드하고, PDF·PPT는 공개 공유 링크를
+                사진·GIF·동영상은 직접 업로드하고, PDF·PPT·일반 URL은 링크로
                 등록합니다. ({attachments.length}/{MAX_EXPERIENCE_ATTACHMENTS})
               </span>
             </div>
@@ -385,7 +372,7 @@ export function ExperienceEditor({
               <button
                 className="admin-secondary-button"
                 disabled={uploading}
-                onClick={() => addDocumentLink('pdf')}
+                onClick={() => addLinkAttachment('pdf')}
                 type="button"
               >
                 PDF 링크 추가
@@ -393,10 +380,18 @@ export function ExperienceEditor({
               <button
                 className="admin-secondary-button"
                 disabled={uploading}
-                onClick={() => addDocumentLink('presentation')}
+                onClick={() => addLinkAttachment('presentation')}
                 type="button"
               >
                 PPT 링크 추가
+              </button>
+              <button
+                className="admin-secondary-button"
+                disabled={uploading}
+                onClick={() => addLinkAttachment('link')}
+                type="button"
+              >
+                URL 링크 추가
               </button>
             </div>
           </div>
@@ -438,7 +433,9 @@ export function ExperienceEditor({
                         ? '동영상'
                         : attachment.kind === 'pdf'
                           ? 'PDF 링크'
-                          : 'PPT 링크'}{' '}
+                          : attachment.kind === 'presentation'
+                            ? 'PPT 링크'
+                            : 'URL 링크'}{' '}
                     · 자료 {index + 1}
                   </span>
                   <input name="attachmentKind" type="hidden" value={attachment.kind} />
@@ -455,15 +452,20 @@ export function ExperienceEditor({
                     />
                   </label>
                   {attachment.kind === 'pdf' ||
-                  attachment.kind === 'presentation' ? (
+                  attachment.kind === 'presentation' ||
+                  attachment.kind === 'link' ? (
                     <label>
-                      공개 공유 링크
+                      {attachment.kind === 'link' ? 'URL 주소' : '공개 공유 링크'}
                       <input
                         name="attachmentUrl"
                         onChange={(event) =>
                           updateAttachment(attachment.key, 'url', event.target.value)
                         }
-                        placeholder="https://drive.google.com/..."
+                        placeholder={
+                          attachment.kind === 'link'
+                            ? 'https://example.com/...'
+                            : 'https://drive.google.com/...'
+                        }
                         required
                         type="url"
                         value={attachment.url}

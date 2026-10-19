@@ -71,6 +71,23 @@ test('업로드 자료와 PDF, PPT 링크를 저장 가능한 첨부 자료로 �
   )
 })
 
+test('일반 웹 URL을 링크 첨부 자료로 만든다', () => {
+  assert.deepEqual(
+    parseExperienceAttachments(
+      ['link'],
+      ['프로젝트 GitHub'],
+      ['https://github.com/example/project'],
+    ),
+    [
+      {
+        kind: 'link',
+        title: '프로젝트 GitHub',
+        url: 'https://github.com/example/project',
+      },
+    ],
+  )
+})
+
 test('첨부 자료의 개수, 종류, 제목, URL을 검증한다', () => {
   assert.equal(
     parseExperienceAttachments(['archive'], ['파일'], ['https://example.com']),

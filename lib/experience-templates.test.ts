@@ -5,6 +5,7 @@ import {
   EXPERIENCE_TEMPLATES,
   createTemplateSections,
   isExperienceTemplateId,
+  shouldPreserveTemplateSections,
 } from './experience-templates.ts'
 
 test('관리자 편집기에서 선택할 수 있는 템플릿은 정확히 네 가지다', () => {
@@ -33,4 +34,23 @@ test('지원하는 템플릿 ID만 검증을 통과한다', () => {
   assert.equal(isExperienceTemplateId('competition'), true)
   assert.equal(isExperienceTemplateId('custom'), false)
   assert.equal(isExperienceTemplateId(''), false)
+})
+
+test('본문이 작성된 경험은 템플릿을 변경해도 기존 내용을 보존한다', () => {
+  assert.equal(
+    shouldPreserveTemplateSections('activity', [
+      { heading: '활동', body: '중부대학교 웹서버보안프로그래밍 실습' },
+    ]),
+    true,
+  )
+})
+
+test('아직 작성하지 않은 기본 항목은 다른 템플릿의 권장 항목으로 교체한다', () => {
+  assert.equal(
+    shouldPreserveTemplateSections(
+      'activity',
+      createTemplateSections('activity'),
+    ),
+    false,
+  )
 })

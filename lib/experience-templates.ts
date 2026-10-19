@@ -66,6 +66,21 @@ export function createTemplateSections(templateId: ExperienceTemplateId) {
   }))
 }
 
+export function shouldPreserveTemplateSections(
+  templateId: ExperienceTemplateId,
+  sections: ReadonlyArray<{ heading: string; body: string }>,
+) {
+  const defaultHeadings = EXPERIENCE_TEMPLATES[templateId].headings
+  return (
+    sections.length !== defaultHeadings.length ||
+    sections.some(
+      (section, index) =>
+        Boolean(section.body.trim()) ||
+        section.heading !== defaultHeadings[index],
+    )
+  )
+}
+
 export function getExperienceTemplateLabel(templateId: ExperienceTemplateId) {
   return EXPERIENCE_TEMPLATES[templateId].label
 }

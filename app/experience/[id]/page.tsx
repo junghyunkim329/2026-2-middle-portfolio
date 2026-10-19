@@ -74,7 +74,11 @@ export default async function ExperienceDetail({
                       target="_blank"
                     >
                       <span>
-                        {attachment.kind === 'pdf' ? 'PDF' : 'PPT'}
+                        {attachment.kind === 'pdf'
+                          ? 'PDF'
+                          : attachment.kind === 'presentation'
+                            ? 'PPT'
+                            : 'URL'}
                       </span>
                       <strong>{attachment.title}</strong>
                       <small>새 탭에서 보기 ↗</small>

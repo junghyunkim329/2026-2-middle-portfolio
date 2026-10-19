@@ -5,6 +5,7 @@ export const EXPERIENCE_ATTACHMENT_KINDS = [
   'video',
   'pdf',
   'presentation',
+  'link',
 ] as const
 
 export type ExperienceAttachmentKind =
