@@ -3,19 +3,27 @@
 import { useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
 import { ExperienceCard } from '@/components/experience-card'
+import { rankExperienceTags } from '@/lib/experience-tags'
 import type { Experience } from '@/lib/experiences'
+
+const POPULAR_TAG_COUNT = 7
 
 export function ExperienceList({ experiences }: { experiences: Experience[] }) {
   const [query, setQuery] = useState('')
   const [selectedTag, setSelectedTag] = useState('전체')
+  const [showAllTags, setShowAllTags] = useState(false)
 
-  const tags = useMemo(
-    () => [
-      '전체',
-      ...new Set(experiences.flatMap((experience) => experience.tags)),
-    ],
+  const rankedTags = useMemo(
+    () => rankExperienceTags(experiences),
     [experiences],
   )
+  const popularTags = rankedTags.slice(0, POPULAR_TAG_COUNT)
+  const visibleTags = showAllTags
+    ? rankedTags
+    : selectedTag !== '전체' && !popularTags.includes(selectedTag)
+      ? [...popularTags, selectedTag]
+      : popularTags
+  const hiddenTagCount = Math.max(0, rankedTags.length - POPULAR_TAG_COUNT)
   const filteredExperiences = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase()
 
@@ -47,18 +55,41 @@ export function ExperienceList({ experiences }: { experiences: Experience[] }) {
             onChange={(event) => setQuery(event.target.value)}
           />
         </label>
-        <div className="experience-filters" aria-label="태그로 필터">
-          {tags.map((tag) => (
+        <div
+          id="experience-tag-options"
+          className="experience-filters"
+          aria-label="태그로 필터"
+        >
+          <button
+            type="button"
+            className={`experience-filter-option ${selectedTag === '전체' ? 'active' : ''}`}
+            aria-pressed={selectedTag === '전체'}
+            onClick={() => setSelectedTag('전체')}
+          >
+            전체
+          </button>
+          {visibleTags.map((tag) => (
             <button
               key={tag}
               type="button"
-              className={selectedTag === tag ? 'active' : ''}
+              className={`experience-filter-option ${selectedTag === tag ? 'active' : ''}`}
               aria-pressed={selectedTag === tag}
               onClick={() => setSelectedTag(tag)}
             >
               {tag}
             </button>
           ))}
+          {hiddenTagCount > 0 ? (
+            <button
+              type="button"
+              className="experience-filter-toggle"
+              aria-expanded={showAllTags}
+              aria-controls="experience-tag-options"
+              onClick={() => setShowAllTags((current) => !current)}
+            >
+              {showAllTags ? '접기' : `더보기 +${hiddenTagCount}`}
+            </button>
+          ) : null}
         </div>
       </section>
       <p className="experience-result-count" aria-live="polite">

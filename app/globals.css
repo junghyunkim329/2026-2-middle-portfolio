@@ -115,6 +115,7 @@ main {
   gap: 30px;
 }
 .interests .card-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   justify-content: center;
 }
 .experience-card {
@@ -171,6 +172,9 @@ main {
 .experience-page {
   padding: 120px 0 145px;
 }
+.experience-page .card-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 .experience-page > h1 {
   margin-bottom: 64px;
 }
@@ -226,6 +230,9 @@ main {
   border-color: var(--ink);
   background: var(--ink);
   color: #fff;
+}
+.experience-filter-toggle {
+  font-weight: 700;
 }
 .experience-result-count {
   margin: 0 0 20px;
@@ -946,6 +953,12 @@ main {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
   }
+  .interests .card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .experience-page .card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .experience-card > img {
     height: 200px;
   }
@@ -1029,6 +1042,10 @@ main {
   .card-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
+  }
+  .interests .card-grid,
+  .experience-page .card-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
   .experience-card > img {
     height: 172px;
